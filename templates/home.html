@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>تشفير وفك التشفير</title>
-  <link rel="icon" href="/static/1.ico" type="image/x-icon">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <link rel="icon" href="/static/1.ico" type="image/x-icon">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = { darkMode: 'class' };
@@ -44,6 +42,22 @@
         alert("المشاركة غير مدعومة في هذا المتصفح.");
       }
     }
+
+    function copyDownloadLink(path) {
+      const fullUrl = window.location.origin + path;
+      navigator.clipboard.writeText(fullUrl)
+        .then(() => alert("✅ تم نسخ الرابط الكامل"))
+        .catch(() => alert("❌ لم يتم النسخ"));
+    }
+
+    function copyToClipboard(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.select();
+        document.execCommand('copy');
+        alert('✅ تم نسخ النص إلى الحافظة');
+      }
+    }
   </script>
 </head>
 <body class="text-white min-h-screen font-sans bg-cover bg-center" style="background-image: url('/static/bg.jpg');">
@@ -77,13 +91,13 @@
       <div class="text-center mt-6">
         <p class="text-gray-300 mb-2">📄 الملف جاهز:</p>
         <a id="downloadLink" href="{{ file_url }}" download class="text-blue-400 underline">تحميل الملف</a>
-        <div class="mt-4">
+        <div class="mt-4 flex flex-col gap-2 items-center">
           <button onclick="shareFile('{{ file_url }}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">📤 مشاركة عبر التطبيقات</button>
+          <button onclick="copyDownloadLink('{{ file_url }}')" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">📋 نسخ رابط التحميل</button>
         </div>
       </div>
     {% endif %}
 
-    <!-- ✅ نموذج تشفير/فك تشفير النصوص -->
     <div class="mt-10">
       <h2 class="text-xl font-bold text-center text-white mb-4">🔤 تشفير وفك تشفير النصوص</h2>
       <form method="POST" class="space-y-4">
@@ -99,7 +113,8 @@
         {% if output_text %}
           <div class="mt-4">
             <p class="text-gray-300 mb-2">📄 الناتج:</p>
-            <textarea rows="4" readonly class="w-full p-3 border border-gray-600 rounded-xl bg-gray-900 text-white">{{ output_text }}</textarea>
+            <textarea id="output_textarea" rows="4" readonly class="w-full p-3 border border-gray-600 rounded-xl bg-gray-900 text-white">{{ output_text }}</textarea>
+            <button type="button" onclick="copyToClipboard('output_textarea')" class="mt-2 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl">📋 نسخ النص</button>
           </div>
         {% endif %}
       </form>
