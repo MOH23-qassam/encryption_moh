@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تشفير وفك التشفير</title>
+  <link rel="icon" href="/static/1.ico" type="image/x-icon">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+
+    window.onload = function () {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    };
+
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.textContent = "🙈";
+      } else {
+        input.type = "password";
+        icon.textContent = "👁️";
+      }
+    }
+
+    function showLoading() {
+      document.getElementById("loading").style.display = "flex";
+    }
+
+    function shareFile(url) {
+      if (navigator.share) {
+        navigator.share({
+          title: 'مشاركة ملف مشفر',
+          text: 'انقر للوصول إلى الملف المشفر.',
+          url: url
+        });
+      } else {
+        alert("المشاركة غير مدعومة في هذا المتصفح.");
+      }
+    }
+  </script>
+</head>
+<body class="text-white min-h-screen font-sans bg-cover bg-center" style="background-image: url('/static/bg.jpg');">
+  <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center flex-col">
+    <svg class="animate-spin h-10 w-10 text-green-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+    <p class="text-lg font-semibold">جاري المعالجة...</p>
+  </div>
+
+  <div class="max-w-xl mx-auto p-6 mt-10 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 bg-opacity-90">
+    <h1 class="text-3xl font-extrabold text-center text-green-400 mb-6">🔐 تشفير وفك تشفير الملفات</h1>
+    <form method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="showLoading()">
+      <input type="file" name="file" class="w-full p-3 border border-gray-600 rounded-xl bg-gray-800 text-white" required />
+      <div class="relative">
+        <input id="password" type="password" name="password" placeholder="كلمة المرور" class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required />
+        <span id="toggle-password" onclick="togglePasswordVisibility('password', 'toggle-password')" class="absolute left-3 top-3 cursor-pointer select-none">👁️</span>
+      </div>
+      <div class="flex gap-2">
+        <button type="submit" name="action" value="encrypt_direct" class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition">🔒 تشفير وتحميل مباشر</button>
+        <button type="submit" name="action" value="encrypt_show" class="flex-1 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition">📎 تشفير وإظهار رابط المشاركة</button>
+      </div>
+      <button type="submit" name="action" value="decrypt" class="w-full bg-yellow-600 text-white py-3 rounded-xl hover:bg-yellow-700 transition">🔓 فك التشفير</button>
+      {% if result %}
+        <p class="text-red-400 text-center font-semibold mt-2">{{ result }}</p>
+      {% endif %}
+    </form>
+
+    {% if file_url %}
+      <div class="text-center mt-6">
+        <p class="text-gray-300 mb-2">📄 الملف جاهز:</p>
+        <a id="downloadLink" href="{{ file_url }}" download class="text-blue-400 underline">تحميل الملف</a>
+        <div class="mt-4">
+          <button onclick="shareFile('{{ file_url }}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">📤 مشاركة عبر التطبيقات</button>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- ✅ نموذج تشفير/فك تشفير النصوص -->
+    <div class="mt-10">
+      <h2 class="text-xl font-bold text-center text-white mb-4">🔤 تشفير وفك تشفير النصوص</h2>
+      <form method="POST" class="space-y-4">
+        <textarea name="text" rows="4" placeholder="أدخل النص هنا..." class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required></textarea>
+        <div class="relative">
+          <input id="password_text" type="password" name="password_text" placeholder="كلمة المرور" class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required>
+          <span id="toggle-password-text" onclick="togglePasswordVisibility('password_text', 'toggle-password-text')" class="absolute left-3 top-3 cursor-pointer select-none">👁️</span>
+        </div>
+        <div class="flex gap-4">
+          <button type="submit" name="action" value="encrypt_text" class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition">🔐 تشفير النص</button>
+          <button type="submit" name="action" value="decrypt_text" class="flex-1 bg-yellow-600 text-white py-3 rounded-xl hover:bg-yellow-700 transition">🔓 فك تشفير النص</button>
+        </div>
+        {% if output_text %}
+          <div class="mt-4">
+            <p class="text-gray-300 mb-2">📄 الناتج:</p>
+            <textarea rows="4" readonly class="w-full p-3 border border-gray-600 rounded-xl bg-gray-900 text-white">{{ output_text }}</textarea>
+          </div>
+        {% endif %}
+      </form>
+    </div>
+
+    <hr class="my-6 border-gray-600" />
+    <div class="text-center mt-6">
+      <a href="/logout" class="text-sm text-gray-400 hover:underline">🚪 تسجيل الخروج</a>
+    </div>
+  </div>
+</body>
+</html>

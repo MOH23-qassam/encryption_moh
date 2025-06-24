@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>تسجيل الدخول</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    function togglePasswordLogin() {
+      const input = document.getElementById("login-password");
+      const toggle = document.getElementById("toggleLoginPassword");
+      if (input.type === "password") {
+        input.type = "text";
+        toggle.textContent = "🙈";
+      } else {
+        input.type = "password";
+        toggle.textContent = "👁️";
+      }
+    }
+  </script>
+</head>
+<body class="bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center h-screen font-sans">
+  <form method="POST" class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md space-y-4">
+    <h2 class="text-3xl font-extrabold text-center text-green-700">🔐 تسجيل الدخول</h2>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <p class="text-red-500 text-sm text-center">{{ messages[0] }}</p>
+    {% endif %}
+    {% endwith %}
+    <input type="text" name="username" placeholder="اسم المستخدم" class="w-full p-3 border border-gray-300 rounded-xl text-right" required>
+    <div class="relative">
+      <input id="login-password" type="password" name="password" placeholder="كلمة المرور" class="w-full p-3 border border-gray-300 rounded-xl text-right" required>
+      <span id="toggleLoginPassword" onclick="togglePasswordLogin()" class="absolute left-3 top-3 cursor-pointer select-none">👁️</span>
+    </div>
+    <button type="submit" class="bg-green-600 text-white w-full py-3 rounded-xl hover:bg-green-700 transition">🚪 دخول</button>
+  </form>
+</body>
+</html>
