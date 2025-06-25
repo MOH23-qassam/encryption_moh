@@ -15,6 +15,32 @@
       else document.documentElement.classList.remove('dark');
     };
 
+    function handleSubmit(event) {
+      const submitButton = document.activeElement;
+      if (!submitButton || !submitButton.value) return true;
+      const action = submitButton.value;
+      if (action === "decrypt" || action === "encrypt_direct") {
+        setTimeout(() => resetFileForm(), 3000);
+        return true;
+      }
+      showLoading();
+      return true;
+    }
+
+    function resetFileForm() {
+      const form = document.getElementById("fileForm");
+      if (form) form.reset();
+    }
+
+    function resetTextForm() {
+      const form = document.getElementById("textForm");
+      if (form) form.reset();
+    }
+
+    function showLoading() {
+      document.getElementById("loading").style.display = "flex";
+    }
+
     function togglePasswordVisibility(inputId, iconId) {
       const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
@@ -25,10 +51,6 @@
         input.type = "password";
         icon.textContent = "👁️";
       }
-    }
-
-    function showLoading() {
-      document.getElementById("loading").style.display = "flex";
     }
 
     function shareFile(url) {
@@ -71,7 +93,8 @@
 
   <div class="max-w-xl mx-auto p-6 mt-10 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 bg-opacity-90">
     <h1 class="text-3xl font-extrabold text-center text-green-400 mb-6">🔐 تشفير وفك تشفير الملفات</h1>
-    <form method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="showLoading()">
+
+    <form id="fileForm" method="POST" enctype="multipart/form-data" class="space-y-4" onsubmit="return handleSubmit(event)">
       <input type="file" name="file" class="w-full p-3 border border-gray-600 rounded-xl bg-gray-800 text-white" required />
       <div class="relative">
         <input id="password" type="password" name="password" placeholder="كلمة المرور" class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required />
@@ -97,10 +120,9 @@
         </div>
       </div>
     {% endif %}
-
     <div class="mt-10">
       <h2 class="text-xl font-bold text-center text-white mb-4">🔤 تشفير وفك تشفير النصوص</h2>
-      <form method="POST" class="space-y-4">
+      <form id="textForm" method="POST" class="space-y-4" onsubmit="setTimeout(() => resetTextForm(), 3000)">
         <textarea name="text" rows="4" placeholder="أدخل النص هنا..." class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required></textarea>
         <div class="relative">
           <input id="password_text" type="password" name="password_text" placeholder="كلمة المرور" class="w-full p-3 border border-gray-600 rounded-xl text-right bg-gray-800 text-white" required>
